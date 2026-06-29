@@ -4,7 +4,8 @@ const TARGET_SAMPLE_RATE = 44100;
 
 const RECORD_DURATION_MS = 5000;
 
-const API_ENDPOINT = '/api/identify';
+const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT || 'http://localhost:8080/api/identify';
+
 export default function App() {
 
   const [status, setStatus] = useState('idle'); //idle,listening,analysing,success,-no-match
@@ -334,14 +335,13 @@ export default function App() {
   }
 
   const uploadAudio = async (wavBlob) => {
-    const formdata = new FormData();
-    // 'file' is the key name that the Java backend will look for in the POST request
-
-    formdata.append('file', wavBlob, 'recording.wav');
 
     const response = await fetch(API_ENDPOINT, {
       method: 'POST',
-      body: formdata,
+      headers: {
+        'Content-Type': 'audio/wav',
+      },
+      body: wavBlob,   //raw binary file
     });
 
     if (!response.ok) {
